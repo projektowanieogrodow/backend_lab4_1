@@ -3,7 +3,6 @@ require("./instrument.js");
 
 // All other imports below
 // Import with `import * as Sentry from "@sentry/node"` if you are using ESM
-const Sentry = require("@sentry/node");
 const express = require("express");
 
 const { initSentry, Sentry } = require('./infrastructure/monitoring/sentry');
