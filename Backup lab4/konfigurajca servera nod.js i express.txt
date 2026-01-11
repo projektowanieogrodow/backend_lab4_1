@@ -1,0 +1,7 @@
+cd "C:\Users\User\Desktop\Backup lab2"
+
+npm install express
+
+npm install dotenv @supabase/supabase-js cors
+
+node app.js

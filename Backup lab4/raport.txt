@@ -1,0 +1,326 @@
+========================================
+ RAPORT TESTOW API - ToDo Application
+ Data: 2026-01-11 16:35:26
+ URL: http://localhost:3000
+========================================
+
+PODSUMOWANIE
+------------
+Testy wykonane: 49
+Sukces: 35 (71%)
+Bledy: 13 (29%)
+Pominiete: 1
+
+SZCZEGOLY TESTOW
+----------------
+
+[SETUP] Rejestracja user1@example.com
+  Status: FAIL
+  Request: POST /auth/register
+  Czas: 2ms
+  Oczekiwano: 201 Created lub 200 OK
+  Otrzymano: Status: 429 - {"error":"Zbyt wiele requestów. Spróbuj ponownie za 15 minut."}
+  Problem: Nieoczekiwany kod odpowiedzi
+  Rekomendacja: Sprawdz konfiguracje Supabase (wylacz potwierdzanie email)
+
+[SETUP] Rejestracja user2@example.com
+  Status: FAIL
+  Request: POST /auth/register
+  Czas: 2ms
+  Oczekiwano: 201 Created lub 200 OK
+  Otrzymano: Status: 429 - {"error":"Zbyt wiele requestów. Spróbuj ponownie za 15 minut."}
+  Problem: Nieoczekiwany kod odpowiedzi
+  Rekomendacja: Sprawdz konfiguracje Supabase (wylacz potwierdzanie email)
+
+[SETUP] Rejestracja admin@example.com
+  Status: FAIL
+  Request: POST /auth/register
+  Czas: 2ms
+  Oczekiwano: 201 Created lub 200 OK
+  Otrzymano: Status: 429 - {"error":"Zbyt wiele requestów. Spróbuj ponownie za 15 minut."}
+  Problem: Nieoczekiwany kod odpowiedzi
+  Rekomendacja: Sprawdz konfiguracje Supabase (wylacz potwierdzanie email)
+
+[BASIC] Test polaczenia z serwerem
+  Status: PASS
+  Request: GET /health
+  Czas: 1ms
+
+[BASIC] Test endpointu /health
+  Status: PASS
+  Request: GET /health
+  Czas: 2ms
+
+[BASIC] Test nieistniejacego endpointu
+  Status: FAIL
+  Request: GET /nieistniejacy/endpoint/12345
+  Czas: 2ms
+  Oczekiwano: 404 Not Found
+  Otrzymano: 429
+  Problem: Serwer nie zwraca 404 dla nieistniejacych endpointow
+  Rekomendacja: Dodaj obsluge 404 dla nieznanych sciezek
+
+[BASIC] Test bez autoryzacji
+  Status: FAIL
+  Request: GET /tasks (bez tokena)
+  Czas: 2ms
+  Oczekiwano: 401 Unauthorized
+  Otrzymano: 429
+  Problem: Serwer nie wymaga autoryzacji dla chronionych endpointow
+  Rekomendacja: Dodaj middleware weryfikujacy token JWT
+
+[BASIC] Test nieprawidlowego tokena
+  Status: FAIL
+  Request: GET /tasks (zly token)
+  Czas: 1ms
+  Oczekiwano: 401 Unauthorized
+  Otrzymano: 429
+  Problem: Serwer akceptuje nieprawidlowe tokeny
+  Rekomendacja: Popraw weryfikacje JWT - sprawdz podpis i format
+
+[BASIC] Test wygaslego tokena
+  Status: FAIL
+  Request: GET /tasks (wygasly token)
+  Czas: 1ms
+  Oczekiwano: 401 Unauthorized
+  Otrzymano: 429
+  Problem: Serwer akceptuje wygasle tokeny
+  Rekomendacja: Sprawdz weryfikacje pola 'exp' w JWT
+
+[BASIC] Test metody OPTIONS
+  Status: FAIL
+  Request: OPTIONS /tasks
+  Czas: 1ms
+  Oczekiwano: 200 OK lub 204
+  Otrzymano: 429
+  Problem: Serwer nie obsluguje poprawnie metody OPTIONS
+  Rekomendacja: Dodaj obsluge CORS/OPTIONS
+
+[BASIC] Test metody HEAD
+  Status: PASS
+  Request: HEAD /health
+  Czas: 1ms
+
+[HAPPY-PATH] Logowanie user1 (user1@example.com)
+  Status: FAIL
+  Request: POST /auth/login {email: user1@example.com}
+  Czas: 1ms
+  Oczekiwano: 200 OK
+  Otrzymano: 429: {"error":"Zbyt wiele requestów. Spróbuj ponownie za 15 minut."}
+  Problem: Logowanie nie powiodlo sie
+  Rekomendacja: Sprawdz dane logowania i endpoint /auth/login
+
+[OWASP] Security Headers
+  Status: PASS
+  Request: Znalezione: X-Content-Type-Options, X-Frame-Options, X-XSS-Protection, Strict-Transport-Security, Content-Security-Policy
+  Czas: 1ms
+
+[OWASP] SQL Injection: Classic OR
+  Status: PASS
+  Request: POST /auth/login (kod: 429)
+  Czas: 2ms
+
+[OWASP] SQL Injection: Comment injection
+  Status: PASS
+  Request: POST /auth/login (kod: 429)
+  Czas: 2ms
+
+[OWASP] SQL Injection: DROP TABLE
+  Status: PASS
+  Request: POST /auth/login (kod: 429)
+  Czas: 2ms
+
+[OWASP] SQL Injection: UNION SELECT
+  Status: PASS
+  Request: POST /auth/login (kod: 429)
+  Czas: 3ms
+
+[OWASP] SQL Injection: Stacked queries
+  Status: PASS
+  Request: POST /auth/login (kod: 429)
+  Czas: 1ms
+
+[OWASP] SQL Injection w Task ID: 1; DROP TABLE t
+  Status: PASS
+  Request: GET /tasks/... (kod: 429)
+  Czas: 2ms
+
+[OWASP] SQL Injection w Task ID: 1 OR 1=1
+  Status: PASS
+  Request: GET /tasks/... (kod: 429)
+  Czas: 2ms
+
+[OWASP] SQL Injection w Task ID: 1' OR '1'='1
+  Status: PASS
+  Request: GET /tasks/... (kod: 429)
+  Czas: 2ms
+
+[OWASP] SQL Injection w Task ID: 1; DELETE FROM 
+  Status: PASS
+  Request: GET /tasks/... (kod: 429)
+  Czas: 2ms
+
+[OWASP] XSS w tytule taska: Script tag
+  Status: PASS
+  Request: Nieoczekiwany kod: 429
+  Czas: 1ms
+
+[OWASP] XSS w tytule taska: Img onerror
+  Status: PASS
+  Request: Nieoczekiwany kod: 429
+  Czas: 2ms
+
+[OWASP] XSS w tytule taska: SVG onload
+  Status: PASS
+  Request: Nieoczekiwany kod: 429
+  Czas: 2ms
+
+[OWASP] XSS w tytule taska: Event handler
+  Status: PASS
+  Request: Nieoczekiwany kod: 429
+  Czas: 2ms
+
+[OWASP] XSS w tytule taska: JavaScript URL
+  Status: PASS
+  Request: Nieoczekiwany kod: 429
+  Czas: 2ms
+
+[OWASP] XSS w tytule taska: Data URL
+  Status: PASS
+  Request: Nieoczekiwany kod: 429
+  Czas: 1ms
+
+[OWASP] XSS w polu email
+  Status: PASS
+  Request: Kod: 429
+  Czas: 2ms
+
+[OWASP] Slabe haslo: '123'
+  Status: PASS
+  Request: Kod: 429
+  Czas: 1ms
+
+[OWASP] Slabe haslo: 'password'
+  Status: PASS
+  Request: Kod: 429
+  Czas: 2ms
+
+[OWASP] Slabe haslo: 'abc'
+  Status: PASS
+  Request: Kod: 429
+  Czas: 2ms
+
+[OWASP] Slabe haslo: '1234'
+  Status: PASS
+  Request: Kod: 429
+  Czas: 2ms
+
+[OWASP] Slabe haslo: 'qwerty'
+  Status: PASS
+  Request: Kod: 429
+  Czas: 2ms
+
+[OWASP] Brute-force: 10 prob w 0.0s
+  Status: PASS
+  Request: Rate limiting aktywny (0 z 10 zaakceptowanych)
+  Czas: 15ms
+
+[OWASP] Token manipulation
+  Status: SKIP
+
+[OWASP] Rate limiting: 100 requestow w 0.1s
+  Status: FAIL
+  Request: 100 requestow do /health
+  Czas: 123ms
+  Oczekiwano: 429 dla czesci requestow
+  Otrzymano: Wszystkie 100 zaakceptowane
+  Problem: Brak rate limitingu - mozliwy atak DDoS
+  Rekomendacja: Dodaj rate limiting middleware. Wiecej: https://owasp.org/Top10/A05_2021-Security_Misconfiguration/
+
+[OWASP] Payload: bardzo dlugi title (10,000 znakow)
+  Status: PASS
+  Request: Kod: 429
+  Czas: 5ms
+
+[OWASP] Payload: bardzo dlugi email (1,000 znakow)
+  Status: PASS
+  Request: Kod: 429
+  Czas: 2ms
+
+[OWASP] Payload: duzy body JSON (1MB)
+  Status: PASS
+  Request: Payload Too Large (413)
+  Czas: 10ms
+
+[OWASP] Payload: duze headery (64KB)
+  Status: PASS
+  Request: Request odrzucony
+  Czas: 1ms
+
+[OWASP] Payload: zagniezdzone JSON (100 poziomow)
+  Status: PASS
+  Request: Zaakceptowany (kod: 429) - sprawdz reczenie
+  Czas: 2ms
+
+[OWASP] Payload: specjalne znaki Unicode
+  Status: PASS
+  Request: Kod: 429 - sprawdz sanityzacje
+  Czas: 1ms
+
+[OWASP] Payload: null bytes w stringu
+  Status: PASS
+  Request: Kod: 429
+  Czas: 2ms
+
+[OWASP] Payload: puste body dla POST
+  Status: PASS
+  Request: Kod: 429
+  Czas: 1ms
+
+[OWASP] Payload: nieprawidlowy JSON
+  Status: FAIL
+  Request: POST /tasks (nieprawidlowy JSON)
+  Czas: 4ms
+  Oczekiwano: 400 Bad Request
+  Otrzymano: 500 Internal Server Error
+  Problem: Serwer nie obsluguje poprawnie blednego JSON
+  Rekomendacja: Dodaj try/catch dla parsowania JSON. Wiecej: https://owasp.org/Top10/A05_2021-Security_Misconfiguration/
+
+[OWASP] Payload: zly Content-Type (text/plain z JSON)
+  Status: PASS
+  Request: Kod: 429
+  Czas: 1ms
+
+[SCHEMA] Schemat GET /health
+  Status: FAIL
+  Request: GET /health
+  Czas: 1ms
+  Oczekiwano: status, validationMode, timestamp
+  Otrzymano: Bledy: [brak pola 'validationMode']
+  Problem: Schemat odpowiedzi niezgodny
+  Rekomendacja: Sprawdz pola w odpowiedzi /health
+
+[SCHEMA] Schemat POST /auth/login
+  Status: FAIL
+  Request: POST /auth/login
+  Czas: 1ms
+  Oczekiwano: 200 OK
+  Otrzymano: Blad lub kod: 429
+  Problem: Logowanie nie powiodlo sie
+  Rekomendacja: Sprawdz endpoint /auth/login
+
+LISTA WYKRYTYCH PROBLEMOW
+-------------------------
+1. [CRITICAL] Rejestracja user1@example.com - Nieoczekiwany kod odpowiedzi
+2. [CRITICAL] Rejestracja user2@example.com - Nieoczekiwany kod odpowiedzi
+3. [CRITICAL] Rejestracja admin@example.com - Nieoczekiwany kod odpowiedzi
+4. [CRITICAL] Test bez autoryzacji - Serwer nie wymaga autoryzacji dla chronionych endpointow
+5. [CRITICAL] Test nieprawidlowego tokena - Serwer akceptuje nieprawidlowe tokeny
+6. [CRITICAL] Test wygaslego tokena - Serwer akceptuje wygasle tokeny
+7. [CRITICAL] Logowanie user1 (user1@example.com) - Logowanie nie powiodlo sie
+8. [CRITICAL] Schemat POST /auth/login - Logowanie nie powiodlo sie
+9. [MEDIUM] Test nieistniejacego endpointu - Serwer nie zwraca 404 dla nieistniejacych endpointow
+10. [MEDIUM] Rate limiting: 100 requestow w 0.1s - Brak rate limitingu - mozliwy atak DDoS
+11. [MEDIUM] Payload: nieprawidlowy JSON - Serwer nie obsluguje poprawnie blednego JSON
+12. [MEDIUM] Schemat GET /health - Schemat odpowiedzi niezgodny
+13. [LOW] Test metody OPTIONS - Serwer nie obsluguje poprawnie metody OPTIONS
